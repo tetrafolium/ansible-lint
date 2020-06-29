@@ -62,7 +62,7 @@ class AnsibleLintRule(object):
             if isinstance(result, str):
                 message = result
             matches.append(Match(prev_line_no + 1, line,
-                           file['path'], self, message))
+                                 file['path'], self, message))
         return matches
 
     def matchtasks(self, file: str, text: str) -> List[Match]:
@@ -94,7 +94,7 @@ class AnsibleLintRule(object):
                 message = result
             task_msg = "Task/Handler: " + ansiblelint.utils.task_to_str(task)
             matches.append(Match(task[ansiblelint.utils.LINE_NUMBER_KEY], task_msg,
-                           file['path'], self, message))
+                                 file['path'], self, message))
         return matches
 
     @staticmethod

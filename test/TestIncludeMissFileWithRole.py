@@ -77,9 +77,9 @@ def _play_files(tmp_path, request):
 @pytest.mark.parametrize(
     '_play_files',
     (
-         pytest.param([PLAY_MISS_INCLUDE,
-                       PLAY_ROLE_INCLUDED_MISS],
-                      id='no exist file include'),
+        pytest.param([PLAY_MISS_INCLUDE,
+                      PLAY_ROLE_INCLUDED_MISS],
+                     id='no exist file include'),
     ),
     indirect=['_play_files']
 )

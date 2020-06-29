@@ -33,8 +33,8 @@ def rules_as_rst(rules: RulesCollection) -> str:
         if d.id.endswith('01'):
 
             section = '{} Rules ({}xx)'.format(
-                    d.tags[0].title(),
-                    d.id[-3:-2])
+                d.tags[0].title(),
+                d.id[-3:-2])
             r += f'\n\n{section}\n{ "-" * len(section) }'
 
         title = f"{d.id}: {d.shortdesc}"
