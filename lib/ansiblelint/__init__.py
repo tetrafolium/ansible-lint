@@ -19,5 +19,5 @@
 # THE SOFTWARE.
 """Main ansible-lint package."""
 
-# deprecated backwards compability:
-from ansiblelint.rules import AnsibleLintRule  # noqa: F401 api backwards compability
+# deprecated backwards compatibility:
+from ansiblelint.rules import AnsibleLintRule  # noqa: F401 api backwards compatibility
