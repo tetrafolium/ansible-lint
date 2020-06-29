@@ -47,14 +47,12 @@ from ansiblelint.constants import ANSIBLE_FAILURE_RC
 from ansiblelint.errors import MatchError
 from typing import Callable, ItemsView, List, Tuple
 
-
 # ansible-lint doesn't need/want to know about encrypted secrets, so we pass a
 # string as the password to enable such yaml files to be opened and parsed
 # successfully.
 DEFAULT_VAULT_PASSWORD = 'x'
 
 PLAYBOOK_DIR = os.environ.get('ANSIBLE_PLAYBOOK_DIR', None)
-
 
 _logger = logging.getLogger(__name__)
 
@@ -83,14 +81,48 @@ LINE_NUMBER_KEY = '__line__'
 FILENAME_KEY = '__file__'
 
 VALID_KEYS = [
-    'name', 'action', 'when', 'async', 'poll', 'notify',
-    'first_available_file', 'include', 'include_tasks', 'import_tasks', 'import_playbook',
-    'tags', 'register', 'ignore_errors', 'delegate_to',
-    'local_action', 'transport', 'remote_user', 'sudo',
-    'sudo_user', 'sudo_pass', 'when', 'connection', 'environment', 'args', 'always_run',
-    'any_errors_fatal', 'changed_when', 'failed_when', 'check_mode', 'delay',
-    'retries', 'until', 'su', 'su_user', 'su_pass', 'no_log', 'run_once',
-    'become', 'become_user', 'become_method', FILENAME_KEY,
+    'name',
+    'action',
+    'when',
+    'async',
+    'poll',
+    'notify',
+    'first_available_file',
+    'include',
+    'include_tasks',
+    'import_tasks',
+    'import_playbook',
+    'tags',
+    'register',
+    'ignore_errors',
+    'delegate_to',
+    'local_action',
+    'transport',
+    'remote_user',
+    'sudo',
+    'sudo_user',
+    'sudo_pass',
+    'when',
+    'connection',
+    'environment',
+    'args',
+    'always_run',
+    'any_errors_fatal',
+    'changed_when',
+    'failed_when',
+    'check_mode',
+    'delay',
+    'retries',
+    'until',
+    'su',
+    'su_user',
+    'su_pass',
+    'no_log',
+    'run_once',
+    'become',
+    'become_user',
+    'become_method',
+    FILENAME_KEY,
 ]
 
 BLOCK_NAME_TO_ACTION_TYPE_MAP = {
@@ -141,6 +173,7 @@ def _rebind_match_filename(filename: str, func) -> Callable:
         except MatchError as e:
             e.filename = filename
             raise e
+
     return func_wrapper
 
 
@@ -158,8 +191,10 @@ def find_children(playbook: Tuple[str, str], playbook_dir: str) -> List:
     basedir = os.path.dirname(playbook[0])
     items = _playbook_items(playbook_ds)
     for item in items:
-        for child in _rebind_match_filename(playbook[0], play_children)(
-                basedir, item, playbook[1], playbook_dir):
+        for child in _rebind_match_filename(playbook[0],
+                                            play_children)(basedir, item,
+                                                           playbook[1],
+                                                           playbook_dir):
             if "$" in child['path'] or "{{" in child['path']:
                 continue
             valid_tokens = list()
@@ -177,8 +212,9 @@ def find_children(playbook: Tuple[str, str], playbook_dir: str) -> List:
 
 def template(basedir, value, vars, fail_on_undefined=False, **kwargs):
     try:
-        value = ansible_template(os.path.abspath(basedir), value, vars,
-                                 **dict(kwargs, fail_on_undefined=fail_on_undefined))
+        value = ansible_template(
+            os.path.abspath(basedir), value, vars,
+            **dict(kwargs, fail_on_undefined=fail_on_undefined))
         # Hack to skip the following exception when using to_json filter on a variable.
         # I guess the filter doesn't like empty vars...
     except (AnsibleError, ValueError, RepresenterError):
@@ -207,10 +243,11 @@ def play_children(basedir, item, parent_type, playbook_dir):
 
     if k in delegate_map:
         if v:
-            v = template(os.path.abspath(basedir),
-                         v,
-                         dict(playbook_dir=PLAYBOOK_DIR or os.path.abspath(basedir)),
-                         fail_on_undefined=False)
+            v = template(
+                os.path.abspath(basedir),
+                v,
+                dict(playbook_dir=PLAYBOOK_DIR or os.path.abspath(basedir)),
+                fail_on_undefined=False)
             return delegate_map[k](basedir, k, v, parent_type)
     return []
 
@@ -231,30 +268,40 @@ def _taskshandlers_children(basedir, k, v, parent_type):
         if 'include' in th:
             append_children(th['include'], basedir, k, parent_type, results)
         elif 'include_tasks' in th:
-            append_children(th['include_tasks'], basedir, k, parent_type, results)
+            append_children(th['include_tasks'], basedir, k, parent_type,
+                            results)
         elif 'import_playbook' in th:
-            append_children(th['import_playbook'], basedir, k, parent_type, results)
+            append_children(th['import_playbook'], basedir, k, parent_type,
+                            results)
         elif 'import_tasks' in th:
-            append_children(th['import_tasks'], basedir, k, parent_type, results)
+            append_children(th['import_tasks'], basedir, k, parent_type,
+                            results)
         elif 'include_role' in th or 'import_role' in th:
             th = normalize_task_v2(th)
             module = th['action']['__ansible_module__']
             if "name" not in th['action']:
-                raise MatchError(
-                    "Failed to find required 'name' key in %s" % module)
+                raise MatchError("Failed to find required 'name' key in %s" %
+                                 module)
             if not isinstance(th['action']["name"], str):
                 raise RuntimeError(
                     "Value assigned to 'name' key on '%s' is not a string." %
                     module)
-            results.extend(_roles_children(basedir, k, [th['action'].get("name")],
-                                           parent_type,
-                                           main=th['action'].get('tasks_from', 'main')))
+            results.extend(
+                _roles_children(basedir,
+                                k, [th['action'].get("name")],
+                                parent_type,
+                                main=th['action'].get('tasks_from', 'main')))
         elif 'block' in th:
-            results.extend(_taskshandlers_children(basedir, k, th['block'], parent_type))
+            results.extend(
+                _taskshandlers_children(basedir, k, th['block'], parent_type))
             if 'rescue' in th:
-                results.extend(_taskshandlers_children(basedir, k, th['rescue'], parent_type))
+                results.extend(
+                    _taskshandlers_children(basedir, k, th['rescue'],
+                                            parent_type))
             if 'always' in th:
-                results.extend(_taskshandlers_children(basedir, k, th['always'], parent_type))
+                results.extend(
+                    _taskshandlers_children(basedir, k, th['always'],
+                                            parent_type))
     return results
 
 
@@ -277,10 +324,13 @@ def _roles_children(basedir, k, v, parent_type, main='main'):
     for role in v:
         if isinstance(role, dict):
             if 'role' in role or 'name' in role:
-                if 'tags' not in role or 'skip_ansible_lint' not in role['tags']:
-                    results.extend(_look_for_role_files(basedir,
-                                                        role.get('role', role.get('name')),
-                                                        main=main))
+                if 'tags' not in role or 'skip_ansible_lint' not in role[
+                        'tags']:
+                    results.extend(
+                        _look_for_role_files(basedir,
+                                             role.get('role',
+                                                      role.get('name')),
+                                             main=main))
             elif k != 'dependencies':
                 raise SystemExit('role dict {0} does not contain a "role" '
                                  'or "name" key'.format(role))
@@ -302,9 +352,7 @@ def _rolepath(basedir, role):
         path_dwim(basedir, os.path.join('roles', role)),
         path_dwim(basedir, role),
         # if included from roles/[role]/meta/main.yml
-        path_dwim(
-            basedir, os.path.join('..', '..', '..', 'roles', role)
-        ),
+        path_dwim(basedir, os.path.join('..', '..', '..', 'roles', role)),
         path_dwim(basedir, os.path.join('..', '..', role)),
     ]
 
@@ -359,7 +407,9 @@ def rolename(filepath):
 
 def _kv_to_dict(v):
     (command, args, kwargs) = tokenize(v)
-    return (dict(__ansible_module__=command, __ansible_arguments__=args, **kwargs))
+    return (dict(__ansible_module__=command,
+                 __ansible_arguments__=args,
+                 **kwargs))
 
 
 def normalize_task_v2(task):
@@ -378,16 +428,18 @@ def normalize_task_v2(task):
         pp = pprint.PrettyPrinter(indent=2)
         task_pprint = pp.pformat(task)
 
-        _logger.critical("Couldn't parse task at %s (%s)\n%s", task_info, e.message, task_pprint)
+        _logger.critical("Couldn't parse task at %s (%s)\n%s", task_info,
+                         e.message, task_pprint)
         raise SystemExit(ANSIBLE_FAILURE_RC)
 
     # denormalize shell -> command conversion
     if '_uses_shell' in arguments:
         action = 'shell'
-        del(arguments['_uses_shell'])
+        del (arguments['_uses_shell'])
 
     for (k, v) in list(task.items()):
-        if k in ('action', 'local_action', 'args', 'delegate_to') or k == action:
+        if k in ('action', 'local_action', 'args',
+                 'delegate_to') or k == action:
             # we don't want to re-assign these values, which were
             # determined by the ModuleArgsParser() above
             continue
@@ -397,14 +449,15 @@ def normalize_task_v2(task):
     result['action'] = dict(__ansible_module__=action)
 
     if '_raw_params' in arguments:
-        result['action']['__ansible_arguments__'] = arguments['_raw_params'].split(' ')
-        del(arguments['_raw_params'])
+        result['action']['__ansible_arguments__'] = arguments[
+            '_raw_params'].split(' ')
+        del (arguments['_raw_params'])
     else:
         result['action']['__ansible_arguments__'] = list()
 
     if 'argv' in arguments and not result['action']['__ansible_arguments__']:
         result['action']['__ansible_arguments__'] = arguments['argv']
-        del(arguments['argv'])
+        del (arguments['argv'])
 
     result['action'].update(arguments)
     return result
@@ -417,7 +470,8 @@ def normalize_task_v1(task):
             if k == 'local_action' or k == 'action':
                 if not isinstance(v, dict):
                     v = _kv_to_dict(v)
-                v['__ansible_arguments__'] = v.get('__ansible_arguments__', list())
+                v['__ansible_arguments__'] = v.get('__ansible_arguments__',
+                                                   list())
                 result['action'] = v
             else:
                 result[k] = v
@@ -439,10 +493,11 @@ def normalize_task_v1(task):
                         # Tasks that include playbooks (rather than task files)
                         # can get here
                         # https://github.com/ansible/ansible-lint/issues/138
-                        raise RuntimeError("Was not expecting value %s of type %s for key %s\n"
-                                           "Task: %s. Check the syntax of your playbook using "
-                                           "ansible-playbook --syntax-check" %
-                                           (str(v), type(v), k, str(task)))
+                        raise RuntimeError(
+                            "Was not expecting value %s of type %s for key %s\n"
+                            "Task: %s. Check the syntax of your playbook using "
+                            "ansible-playbook --syntax-check" %
+                            (str(v), type(v), k, str(task)))
             v['__ansible_arguments__'] = v.get('__ansible_arguments__', list())
             result['action'] = v
     if 'module' in result['action']:
@@ -451,17 +506,17 @@ def normalize_task_v1(task):
         #   module: ec2
         #   etc...
         result['action']['__ansible_module__'] = result['action']['module']
-        del(result['action']['module'])
+        del (result['action']['module'])
     if 'args' in result:
         result['action'].update(result.get('args'))
-        del(result['args'])
+        del (result['args'])
     return result
 
 
 def normalize_task(task, filename):
     ansible_action_type = task.get('__ansible_action_type__', 'task')
     if '__ansible_action_type__' in task:
-        del(task['__ansible_action_type__'])
+        del (task['__ansible_action_type__'])
     task = normalize_task_v2(task)
     task[FILENAME_KEY] = filename
     task['__ansible_action_type__'] = ansible_action_type
@@ -473,9 +528,10 @@ def task_to_str(task):
     if name:
         return name
     action = task.get("action")
-    args = " ".join([u"{0}={1}".format(k, v) for (k, v) in action.items()
-                     if k not in ["__ansible_module__", "__ansible_arguments__"]] +
-                    action.get("__ansible_arguments__"))
+    args = " ".join([
+        u"{0}={1}".format(k, v) for (k, v) in action.items()
+        if k not in ["__ansible_module__", "__ansible_arguments__"]
+    ] + action.get("__ansible_arguments__"))
     return u"{0} {1}".format(action["__ansible_module__"], args)
 
 
@@ -485,7 +541,8 @@ def extract_from_list(blocks, candidates):
         for candidate in candidates:
             if isinstance(block, dict) and candidate in block:
                 if isinstance(block[candidate], list):
-                    results.extend(add_action_type(block[candidate], candidate))
+                    results.extend(add_action_type(block[candidate],
+                                                   candidate))
                 elif block[candidate] is not None:
                     raise RuntimeError(
                         "Key '%s' defined, but bad value: '%s'" %
@@ -496,7 +553,8 @@ def extract_from_list(blocks, candidates):
 def add_action_type(actions, action_type):
     results = list()
     for action in actions:
-        action['__ansible_action_type__'] = BLOCK_NAME_TO_ACTION_TYPE_MAP[action_type]
+        action['__ansible_action_type__'] = BLOCK_NAME_TO_ACTION_TYPE_MAP[
+            action_type]
         results.append(action)
     return results
 
@@ -506,17 +564,24 @@ def get_action_tasks(yaml, file):
     if file['type'] in ['tasks', 'handlers']:
         tasks = add_action_type(yaml, file['type'])
     else:
-        tasks.extend(extract_from_list(yaml, ['tasks', 'handlers', 'pre_tasks', 'post_tasks']))
+        tasks.extend(
+            extract_from_list(
+                yaml, ['tasks', 'handlers', 'pre_tasks', 'post_tasks']))
 
     # Add sub-elements of block/rescue/always to tasks list
     tasks.extend(extract_from_list(tasks, ['block', 'rescue', 'always']))
     # Remove block/rescue/always elements from tasks list
     block_rescue_always = ('block', 'rescue', 'always')
-    tasks[:] = [task for task in tasks if all(k not in task for k in block_rescue_always)]
+    tasks[:] = [
+        task for task in tasks
+        if all(k not in task for k in block_rescue_always)
+    ]
 
-    return [task for task in tasks if
-            set(['include', 'include_tasks',
-                 'import_playbook', 'import_tasks']).isdisjoint(task.keys())]
+    return [
+        task for task in tasks
+        if set(['include', 'include_tasks', 'import_playbook', 'import_tasks'
+                ]).isdisjoint(task.keys())
+    ]
 
 
 def get_normalized_tasks(yaml, file):
@@ -557,7 +622,8 @@ def parse_yaml_linenumbers(data, filename):
 
     try:
         kwargs = {}
-        if 'vault_password' in inspect.getfullargspec(AnsibleLoader.__init__).args:
+        if 'vault_password' in inspect.getfullargspec(
+                AnsibleLoader.__init__).args:
             kwargs['vault_password'] = DEFAULT_VAULT_PASSWORD
         loader = AnsibleLoader(data, **kwargs)
         loader.compose_node = compose_node
@@ -617,14 +683,11 @@ def is_playbook(filename: str) -> bool:
         f = parse_yaml_from_file(filename)
     except Exception as e:
         _logger.warning(
-            "Failed to load %s with %s, assuming is not a playbook.",
-            filename, e)
+            "Failed to load %s with %s, assuming is not a playbook.", filename,
+            e)
     else:
-        if (
-            isinstance(f, AnsibleSequence) and
-            hasattr(f, 'keys') and
-            playbooks_keys.intersection(next(iter(f), {}).keys())
-        ):
+        if (isinstance(f, AnsibleSequence) and hasattr(f, 'keys')
+                and playbooks_keys.intersection(next(iter(f), {}).keys())):
             return True
     return False
 
@@ -638,26 +701,19 @@ def get_yaml_files(options: Namespace) -> dict:
     out = None
 
     try:
-        out = subprocess.check_output(
-            git_command,
-            stderr=subprocess.STDOUT,
-            universal_newlines=True
-        ).split()
+        out = subprocess.check_output(git_command,
+                                      stderr=subprocess.STDOUT,
+                                      universal_newlines=True).split()
     except subprocess.CalledProcessError as exc:
-        _logger.warning(
-            "Failed to discover yaml files to lint using git: %s",
-            exc.output.rstrip('\n')
-        )
+        _logger.warning("Failed to discover yaml files to lint using git: %s",
+                        exc.output.rstrip('\n'))
     except FileNotFoundError as exc:
         if options.verbosity:
-            _logger.warning(
-                "Failed to locate command: %s", exc
-            )
+            _logger.warning("Failed to locate command: %s", exc)
 
     if out is None:
         out = [
-            os.path.join(root, name)
-            for root, dirs, files in os.walk('.')
+            os.path.join(root, name) for root, dirs, files in os.walk('.')
             for name in files
             if name.endswith('.yaml') or name.endswith('.yml')
         ]
@@ -699,8 +755,8 @@ def get_playbooks_and_roles(options=None) -> List[str]:
             _logger.debug('Ignored %s due to: %s', p, e)
             continue
 
-        if (next((i for i in p.parts if i.endswith('playbooks')), None) or
-                'playbook' in p.parts[-1]):
+        if (next((i for i in p.parts if i.endswith('playbooks')), None)
+                or 'playbook' in p.parts[-1]):
             playbooks.append(normpath(p))
             continue
 

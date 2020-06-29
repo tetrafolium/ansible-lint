@@ -24,11 +24,9 @@ from ansiblelint.rules import AnsibleLintRule
 class UseCommandInsteadOfShellRule(AnsibleLintRule):
     id = '305'
     shortdesc = 'Use shell only when shell functionality is required'
-    description = (
-        'Shell should only be used when piping, redirecting '
-        'or chaining commands (and Ansible would be preferred '
-        'for some of those!)'
-    )
+    description = ('Shell should only be used when piping, redirecting '
+                   'or chaining commands (and Ansible would be preferred '
+                   'for some of those!)')
     severity = 'HIGH'
     tags = ['command-shell', 'safety', 'ANSIBLE0013']
     version_added = 'historic'
@@ -40,6 +38,6 @@ class UseCommandInsteadOfShellRule(AnsibleLintRule):
             if 'cmd' in task['action']:
                 unjinjad_cmd = self.unjinja(task["action"].get("cmd", []))
             else:
-                unjinjad_cmd = self.unjinja(
-                    ' '.join(task["action"].get("__ansible_arguments__", [])))
+                unjinjad_cmd = self.unjinja(' '.join(task["action"].get(
+                    "__ansible_arguments__", [])))
             return not any([ch in unjinjad_cmd for ch in '&|<>;$\n*[]{}?'])

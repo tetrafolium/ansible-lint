@@ -10,8 +10,7 @@ class TestCliRolePaths(unittest.TestCase):
 
     def run_ansible_lint(self, cwd, role_path=None, bin=None, env=None):
         command = '{} -v {}'.format(
-            bin or (sys.executable + " -m ansiblelint"),
-            role_path or "")
+            bin or (sys.executable + " -m ansiblelint"), role_path or "")
 
         result, err = subprocess.Popen(
             [command],
@@ -37,7 +36,9 @@ class TestCliRolePaths(unittest.TestCase):
         cwd = self.local_test_dir
         role_path = 'test-role'
 
-        result = self.run_ansible_lint(cwd=cwd, role_path=role_path, bin="ansible-lint")
+        result = self.run_ansible_lint(cwd=cwd,
+                                       role_path=role_path,
+                                       bin="ansible-lint")
         self.assertIn('Use shell only when shell functionality is required',
                       str(result))
 
@@ -91,7 +92,8 @@ class TestCliRolePaths(unittest.TestCase):
         env['ANSIBLE_ROLES_PATH'] = os.path.dirname(cwd)
 
         result = self.run_ansible_lint(cwd=cwd, role_path=role_path, env=env)
-        self.assertIn('Use shell only when shell functionality is required', str(result))
+        self.assertIn('Use shell only when shell functionality is required',
+                      str(result))
 
     def test_run_role_name_invalid(self):
         cwd = self.local_test_dir

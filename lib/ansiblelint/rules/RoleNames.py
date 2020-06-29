@@ -28,15 +28,13 @@ ROLE_NAME_REGEX = '^[a-z][a-z0-9_]+$'
 
 class RoleNames(AnsibleLintRule):
     id = '106'
-    shortdesc = (
-        "Role name {} does not match ``%s`` pattern" % ROLE_NAME_REGEX
-    )
+    shortdesc = ("Role name {} does not match ``%s`` pattern" %
+                 ROLE_NAME_REGEX)
     description = (
         "Role names are now limited to contain only lowercase alphanumeric "
         "characters, plus '_' and start with an alpha character. See "
         "`developing collections <https://docs.ansible.com/ansible/devel/dev_guide/developing_"
-        "collections.html#roles-directory>`_"
-    )
+        "collections.html#roles-directory>`_")
     severity = 'HIGH'
     done: List[str] = []  # already noticed roles list
     tags = ['deprecated']

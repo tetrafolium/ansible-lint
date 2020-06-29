@@ -5,7 +5,6 @@ try:
 except ImportError:
     pass
 
-
 try:
     __version__ = pkg_resources.get_distribution('ansible-lint').version
 except Exception:

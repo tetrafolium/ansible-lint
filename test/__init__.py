@@ -8,13 +8,11 @@ from ansible import __version__ as ansible_version_str
 
 from ansiblelint.runner import Runner
 
-
 ANSIBLE_MAJOR_VERSION = tuple(map(int, ansible_version_str.split('.')[:2]))
 
 
 class RunFromText(object):
     """Use Runner on temp files created from unittest text snippets."""
-
     def __init__(self, collection):
         """Initialize a RunFromText instance with rules collection."""
         self.collection = collection

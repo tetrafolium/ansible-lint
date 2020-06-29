@@ -8,10 +8,8 @@ from ansiblelint.rules import AnsibleLintRule
 class MetaTagValidRule(AnsibleLintRule):
     id = '702'
     shortdesc = 'Tags must contain lowercase letters and digits only'
-    description = (
-        'Tags must contain lowercase letters and digits only, '
-        'and ``galaxy_tags`` is expected to be a list'
-    )
+    description = ('Tags must contain lowercase letters and digits only, '
+                   'and ``galaxy_tags`` is expected to be a list')
     severity = 'HIGH'
     tags = ['metadata']
     version_added = 'v4.0.0'
@@ -33,27 +31,31 @@ class MetaTagValidRule(AnsibleLintRule):
             if isinstance(galaxy_info['galaxy_tags'], list):
                 tags += galaxy_info['galaxy_tags']
             else:
-                results.append(({'meta/main.yml': data},
-                                "Expected 'galaxy_tags' to be a list"))
+                results.append(({
+                    'meta/main.yml': data
+                }, "Expected 'galaxy_tags' to be a list"))
 
         if 'categories' in galaxy_info:
-            results.append(({'meta/main.yml': data},
-                            "Use 'galaxy_tags' rather than 'categories'"))
+            results.append(({
+                'meta/main.yml': data
+            }, "Use 'galaxy_tags' rather than 'categories'"))
             if isinstance(galaxy_info['categories'], list):
                 tags += galaxy_info['categories']
             else:
-                results.append(({'meta/main.yml': data},
-                                "Expected 'categories' to be a list"))
+                results.append(({
+                    'meta/main.yml': data
+                }, "Expected 'categories' to be a list"))
 
         for tag in tags:
             msg = self.shortdesc
             if not isinstance(tag, str):
-                results.append((
-                    {'meta/main.yml': data},
-                    "Tags must be strings: '{}'".format(tag)))
+                results.append(({
+                    'meta/main.yml': data
+                }, "Tags must be strings: '{}'".format(tag)))
                 continue
             if not re.match(self.TAG_REGEXP, tag):
-                results.append(({'meta/main.yml': data},
-                                "{}, invalid: '{}'".format(msg, tag)))
+                results.append(({
+                    'meta/main.yml': data
+                }, "{}, invalid: '{}'".format(msg, tag)))
 
         return results

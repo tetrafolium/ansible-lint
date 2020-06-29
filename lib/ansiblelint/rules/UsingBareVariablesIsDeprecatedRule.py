@@ -29,8 +29,7 @@ class UsingBareVariablesIsDeprecatedRule(AnsibleLintRule):
     description = (
         'Using bare variables is deprecated. Update your '
         'playbooks so that the environment value uses the full variable '
-        'syntax ``{{ your_variable }}``'
-    )
+        'syntax ``{{ your_variable }}``')
     severity = 'VERY_HIGH'
     tags = ['deprecated', 'formatting', 'ANSIBLE0015']
     version_added = 'historic'
@@ -39,10 +38,13 @@ class UsingBareVariablesIsDeprecatedRule(AnsibleLintRule):
     _glob = re.compile('[][*?]')
 
     def matchtask(self, file, task):
-        loop_type = next((key for key in task
-                          if key.startswith("with_")), None)
+        loop_type = next((key for key in task if key.startswith("with_")),
+                         None)
         if loop_type:
-            if loop_type in ["with_nested", "with_together", "with_flattened", "with_filetree"]:
+            if loop_type in [
+                    "with_nested", "with_together", "with_flattened",
+                    "with_filetree"
+            ]:
                 # These loops can either take a list defined directly in the task
                 # or a variable that is a list itself.  When a single variable is used
                 # we just need to check that one variable, and not iterate over it like
@@ -54,20 +56,20 @@ class UsingBareVariablesIsDeprecatedRule(AnsibleLintRule):
                     return self._matchvar(var, task, loop_type)
             elif loop_type == "with_subelements":
                 return self._matchvar(task[loop_type][0], task, loop_type)
-            elif loop_type in ["with_sequence", "with_ini",
-                               "with_inventory_hostnames"]:
+            elif loop_type in [
+                    "with_sequence", "with_ini", "with_inventory_hostnames"
+            ]:
                 pass
             else:
                 return self._matchvar(task[loop_type], task, loop_type)
 
     def _matchvar(self, varstring, task, loop_type):
-        if (isinstance(varstring, str) and
-                not self._jinja.match(varstring)):
-            valid = loop_type == 'with_fileglob' and bool(self._jinja.search(varstring) or
-                                                          self._glob.search(varstring))
+        if (isinstance(varstring, str) and not self._jinja.match(varstring)):
+            valid = loop_type == 'with_fileglob' and bool(
+                self._jinja.search(varstring) or self._glob.search(varstring))
 
-            valid |= loop_type == 'with_filetree' and bool(self._jinja.search(varstring) or
-                                                           varstring.endswith(os.sep))
+            valid |= loop_type == 'with_filetree' and bool(
+                self._jinja.search(varstring) or varstring.endswith(os.sep))
             if not valid:
                 message = "Found a bare variable '{0}' used in a '{1}' loop." + \
                           " You should use the full variable syntax ('{{{{ {0} }}}}')"

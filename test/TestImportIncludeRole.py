@@ -2,7 +2,6 @@ import pytest
 
 from ansiblelint.runner import Runner
 
-
 ROLE_TASKS_MAIN = '''
 - name: shell instead of command
   shell: echo hello world
@@ -65,25 +64,34 @@ def playbook_path(request, tmp_path):
 
 
 @pytest.mark.parametrize(('playbook_path', 'messages'), (
-    pytest.param(PLAY_IMPORT_ROLE,
-                 ['only when shell functionality is required'],
-                 id='IMPORT_ROLE',
-                 ),
-    pytest.param(PLAY_IMPORT_ROLE_INLINE,
-                 ['only when shell functionality is require'],
-                 id='IMPORT_ROLE_INLINE',
-                 ),
-    pytest.param(PLAY_INCLUDE_ROLE,
-                 ['only when shell functionality is require',
-                  'All tasks should be named'],
-                 id='INCLUDE_ROLE',
-                 ),
-    pytest.param(PLAY_INCLUDE_ROLE_INLINE,
-                 ['only when shell functionality is require',
-                  'All tasks should be named'],
-                 id='INCLUDE_ROLE_INLINE',
-                 ),
-), indirect=('playbook_path', ))
+    pytest.param(
+        PLAY_IMPORT_ROLE,
+        ['only when shell functionality is required'],
+        id='IMPORT_ROLE',
+    ),
+    pytest.param(
+        PLAY_IMPORT_ROLE_INLINE,
+        ['only when shell functionality is require'],
+        id='IMPORT_ROLE_INLINE',
+    ),
+    pytest.param(
+        PLAY_INCLUDE_ROLE,
+        [
+            'only when shell functionality is require',
+            'All tasks should be named'
+        ],
+        id='INCLUDE_ROLE',
+    ),
+    pytest.param(
+        PLAY_INCLUDE_ROLE_INLINE,
+        [
+            'only when shell functionality is require',
+            'All tasks should be named'
+        ],
+        id='INCLUDE_ROLE_INLINE',
+    ),
+),
+                         indirect=('playbook_path', ))
 def test_import_role2(default_rules_collection, playbook_path, messages):
     runner = Runner(default_rules_collection, playbook_path, [], [], [])
     results = runner.run()
@@ -91,13 +99,14 @@ def test_import_role2(default_rules_collection, playbook_path, messages):
         assert message in str(results)
 
 
-@pytest.mark.parametrize(('playbook_path', 'messages'), (
-    pytest.param(PLAY_IMPORT_ROLE_INCOMPLETE,
-                 ["Failed to find required 'name' key in import_role"],
-                 id='IMPORT_ROLE_INCOMPLETE',
-                 ),
-), indirect=('playbook_path', ))
-def test_invalid_import_role(default_rules_collection, playbook_path, messages):
+@pytest.mark.parametrize(('playbook_path', 'messages'), (pytest.param(
+    PLAY_IMPORT_ROLE_INCOMPLETE,
+    ["Failed to find required 'name' key in import_role"],
+    id='IMPORT_ROLE_INCOMPLETE',
+), ),
+                         indirect=('playbook_path', ))
+def test_invalid_import_role(default_rules_collection, playbook_path,
+                             messages):
     runner = Runner(default_rules_collection, playbook_path, [], [], [])
     results = runner.run()
     for message in messages:

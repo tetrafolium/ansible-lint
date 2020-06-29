@@ -33,22 +33,24 @@ from ansiblelint.__main__ import initialize_logger
 from ansiblelint import cli
 
 
-@pytest.mark.parametrize(('string', 'expected_cmd', 'expected_args', 'expected_kwargs'), (
-    pytest.param('', '', [], {}, id='blank'),
-    pytest.param('vars:', 'vars', [], {}, id='single_word'),
-    pytest.param('hello: a=1', 'hello', [], {'a': '1'}, id='string_module_and_arg'),
-    pytest.param('action: hello a=1', 'hello', [], {'a': '1'}, id='strips_action'),
-    pytest.param('action: whatever bobbins x=y z=x c=3',
-                 'whatever',
-                 ['bobbins', 'x=y', 'z=x', 'c=3'],
-                 {},
-                 id='more_than_one_arg'),
-    pytest.param('action: command chdir=wxy creates=zyx tar xzf zyx.tgz',
-                 'command',
-                 ['tar', 'xzf', 'zyx.tgz'],
-                 {'chdir': 'wxy', 'creates': 'zyx'},
-                 id='command_with_args'),
-))
+@pytest.mark.parametrize(
+    ('string', 'expected_cmd', 'expected_args', 'expected_kwargs'), (
+        pytest.param('', '', [], {}, id='blank'),
+        pytest.param('vars:', 'vars', [], {}, id='single_word'),
+        pytest.param(
+            'hello: a=1', 'hello', [], {'a': '1'}, id='string_module_and_arg'),
+        pytest.param(
+            'action: hello a=1', 'hello', [], {'a': '1'}, id='strips_action'),
+        pytest.param('action: whatever bobbins x=y z=x c=3',
+                     'whatever', ['bobbins', 'x=y', 'z=x', 'c=3'], {},
+                     id='more_than_one_arg'),
+        pytest.param('action: command chdir=wxy creates=zyx tar xzf zyx.tgz',
+                     'command', ['tar', 'xzf', 'zyx.tgz'], {
+                         'chdir': 'wxy',
+                         'creates': 'zyx'
+                     },
+                     id='command_with_args'),
+    ))
 def test_tokenize(string, expected_cmd, expected_args, expected_kwargs):
     (cmd, args, kwargs) = utils.tokenize(string)
     assert cmd == expected_cmd
@@ -56,17 +58,42 @@ def test_tokenize(string, expected_cmd, expected_args, expected_kwargs):
     assert kwargs == expected_kwargs
 
 
-@pytest.mark.parametrize(('reference_form', 'alternate_forms'), (
-    pytest.param(dict(name='hello', action='command chdir=abc echo hello world'),
-                 (dict(name="hello", command="chdir=abc echo hello world"), ),
-                 id='simple_command'),
-    pytest.param({'git': {'version': 'abc'}, 'args': {'repo': 'blah', 'dest': 'xyz'}},
-                 ({'git': {'version': 'abc', 'repo': 'blah', 'dest': 'xyz'}},
-                  {"git": 'version=abc repo=blah dest=xyz'},
-                  {"git": None, "args": {'repo': 'blah', 'dest': 'xyz', 'version': 'abc'}},
-                  ),
-                 id='args')
-))
+@pytest.mark.parametrize(
+    ('reference_form', 'alternate_forms'),
+    (pytest.param(dict(name='hello',
+                       action='command chdir=abc echo hello world'),
+                  (dict(name="hello", command="chdir=abc echo hello world"), ),
+                  id='simple_command'),
+     pytest.param(
+         {
+             'git': {
+                 'version': 'abc'
+             },
+             'args': {
+                 'repo': 'blah',
+                 'dest': 'xyz'
+             }
+         }, (
+             {
+                 'git': {
+                     'version': 'abc',
+                     'repo': 'blah',
+                     'dest': 'xyz'
+                 }
+             },
+             {
+                 "git": 'version=abc repo=blah dest=xyz'
+             },
+             {
+                 "git": None,
+                 "args": {
+                     'repo': 'blah',
+                     'dest': 'xyz',
+                     'version': 'abc'
+                 }
+             },
+         ),
+         id='args')))
 def test_normalize(reference_form, alternate_forms):
     normal_form = utils.normalize_task(reference_form, 'tasks.yml')
 
@@ -75,21 +102,31 @@ def test_normalize(reference_form, alternate_forms):
 
 
 def test_normalize_complex_command():
-    task1 = dict(name="hello", action={'module': 'pip',
-                                       'name': 'df',
-                                       'editable': 'false'})
-    task2 = dict(name="hello", pip={'name': 'df',
-                                    'editable': 'false'})
+    task1 = dict(name="hello",
+                 action={
+                     'module': 'pip',
+                     'name': 'df',
+                     'editable': 'false'
+                 })
+    task2 = dict(name="hello", pip={'name': 'df', 'editable': 'false'})
     task3 = dict(name="hello", pip="name=df editable=false")
     task4 = dict(name="hello", action="pip name=df editable=false")
-    assert utils.normalize_task(task1, 'tasks.yml') == utils.normalize_task(task2, 'tasks.yml')
-    assert utils.normalize_task(task2, 'tasks.yml') == utils.normalize_task(task3, 'tasks.yml')
-    assert utils.normalize_task(task3, 'tasks.yml') == utils.normalize_task(task4, 'tasks.yml')
+    assert utils.normalize_task(task1, 'tasks.yml') == utils.normalize_task(
+        task2, 'tasks.yml')
+    assert utils.normalize_task(task2, 'tasks.yml') == utils.normalize_task(
+        task3, 'tasks.yml')
+    assert utils.normalize_task(task3, 'tasks.yml') == utils.normalize_task(
+        task4, 'tasks.yml')
 
 
 def test_extract_from_list():
     block = {
-        'block': [{'tasks': {'name': 'hello', 'command': 'whoami'}}],
+        'block': [{
+            'tasks': {
+                'name': 'hello',
+                'command': 'whoami'
+            }
+        }],
         'test_none': None,
         'test_string': 'foo',
     }
@@ -151,29 +188,19 @@ def test_expand_paths_vars(monkeypatch):
 
 @pytest.mark.parametrize(
     ('reset_env_var', 'message_prefix'),
-    (
-        ('PATH',
-            "Failed to locate command: "),
-        ('GIT_DIR',
-            "Failed to discover yaml files to lint using git: ")
-    ),
+    (('PATH', "Failed to locate command: "),
+     ('GIT_DIR', "Failed to discover yaml files to lint using git: ")),
     ids=('no Git installed', 'outside Git repository'),
 )
-def test_get_yaml_files_git_verbose(
-    reset_env_var,
-    message_prefix,
-    monkeypatch,
-    caplog
-):
+def test_get_yaml_files_git_verbose(reset_env_var, message_prefix, monkeypatch,
+                                    caplog):
     options = cli.get_config(['-v'])
     initialize_logger(options.verbosity)
     monkeypatch.setenv(reset_env_var, '')
     utils.get_yaml_files(options)
 
-    expected_info = (
-        "ansiblelint.utils",
-        logging.INFO,
-        'Discovering files to lint: git ls-files *.yaml *.yml')
+    expected_info = ("ansiblelint.utils", logging.INFO,
+                     'Discovering files to lint: git ls-files *.yaml *.yml')
 
     assert expected_info in caplog.record_tuples
     assert any(m.startswith(message_prefix) for m in caplog.messages)
@@ -197,9 +224,8 @@ def test_get_yaml_files_silent(is_in_git, monkeypatch, capsys):
     if not is_in_git:
         monkeypatch.setenv('GIT_DIR', '')
 
-    yaml_count = (
-        len(list(lint_path.glob('**/*.yml'))) + len(list(lint_path.glob('**/*.yaml')))
-    )
+    yaml_count = (len(list(lint_path.glob('**/*.yml'))) +
+                  len(list(lint_path.glob('**/*.yaml'))))
 
     monkeypatch.chdir(str(lint_path))
     files = utils.get_yaml_files(options)
@@ -207,9 +233,7 @@ def test_get_yaml_files_silent(is_in_git, monkeypatch, capsys):
     assert not stderr, 'No stderr output is expected when the verbosity is off'
     assert len(files) == yaml_count, (
         "Expected to find {yaml_count} yaml files in {lint_path}".format_map(
-            locals(),
-        )
-    )
+            locals(), ))
 
 
 def test_logger_debug(caplog):

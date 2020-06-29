@@ -10,19 +10,18 @@ class MetaVideoLinksRule(AnsibleLintRule):
     description = (
         'Items in ``video_links`` in meta/main.yml should be '
         'dictionaries, and contain only keys ``url`` and ``title``, '
-        'and have a shared link from a supported provider'
-    )
+        'and have a shared link from a supported provider')
     severity = 'LOW'
     tags = ['metadata']
     version_added = 'v4.0.0'
 
     VIDEO_REGEXP = {
-        'google': re.compile(
-            r'https://drive\.google\.com.*file/d/([0-9A-Za-z-_]+)/.*'),
-        'vimeo': re.compile(
-            r'https://vimeo\.com/([0-9]+)'),
-        'youtube': re.compile(
-            r'https://youtu\.be/([0-9A-Za-z-_]+)'),
+        'google':
+        re.compile(r'https://drive\.google\.com.*file/d/([0-9A-Za-z-_]+)/.*'),
+        'vimeo':
+        re.compile(r'https://vimeo\.com/([0-9]+)'),
+        'youtube':
+        re.compile(r'https://youtu\.be/([0-9A-Za-z-_]+)'),
     }
 
     def matchplay(self, file, data):
@@ -41,14 +40,16 @@ class MetaVideoLinksRule(AnsibleLintRule):
 
         for video in video_links:
             if not isinstance(video, dict):
-                results.append(({'meta/main.yml': data},
-                                "Expected item in 'video_links' to be "
+                results.append(({
+                    'meta/main.yml': data
+                }, "Expected item in 'video_links' to be "
                                 "a dictionary"))
                 continue
 
             if set(video) != {'url', 'title', '__file__', '__line__'}:
-                results.append(({'meta/main.yml': data},
-                                "Expected item in 'video_links' to contain "
+                results.append(({
+                    'meta/main.yml': data
+                }, "Expected item in 'video_links' to contain "
                                 "only keys 'url' and 'title'"))
                 continue
 

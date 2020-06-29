@@ -38,18 +38,22 @@ except ImportError:
 class CommandsInsteadOfArgumentsRule(AnsibleLintRule):
     id = '302'
     shortdesc = 'Using command rather than an argument to e.g. file'
-    description = (
-        'Executing a command when there are arguments to modules '
-        'is generally a bad idea'
-    )
+    description = ('Executing a command when there are arguments to modules '
+                   'is generally a bad idea')
     severity = 'VERY_HIGH'
     tags = ['command-shell', 'resources', 'ANSIBLE0007']
     version_added = 'historic'
 
     _commands = ['command', 'shell', 'raw']
-    _arguments = {'chown': 'owner', 'chmod': 'mode', 'chgrp': 'group',
-                  'ln': 'state=link', 'mkdir': 'state=directory',
-                  'rmdir': 'state=absent', 'rm': 'state=absent'}
+    _arguments = {
+        'chown': 'owner',
+        'chmod': 'mode',
+        'chgrp': 'group',
+        'ln': 'state=link',
+        'mkdir': 'state=directory',
+        'rmdir': 'state=absent',
+        'rm': 'state=absent'
+    }
 
     def matchtask(self, file, task):
         if task["action"]["__ansible_module__"] in self._commands:

@@ -8,21 +8,25 @@ from ansiblelint.runner import Runner
     (
         pytest.param('blockincludes', 4, id='block included tasks'),
         pytest.param(
-            'blockincludes2', 4,
+            'blockincludes2',
+            4,
             id='block included tasks with rescue and always',
         ),
         pytest.param('taskincludes', 4, id='included tasks'),
         pytest.param(
-            'taskincludes_2_4_style', 4,
+            'taskincludes_2_4_style',
+            4,
             id='include tasks 2.4 style',
         ),
         pytest.param('taskimports', 4, id='import tasks 2 4 style'),
         pytest.param(
-            'include-in-block', 3,
+            'include-in-block',
+            3,
             id='include tasks with block include',
         ),
         pytest.param(
-            'include-import-tasks-in-role', 4,
+            'include-import-tasks-in-role',
+            4,
             id='include tasks in role',
         ),
     ),
