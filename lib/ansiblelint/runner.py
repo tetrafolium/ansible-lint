@@ -91,7 +91,7 @@ class Runner(object):
                 ansiblelint.utils.normpath(file['path']),
                 file['type'])
             matches.extend(self.rules.run(file, tags=set(self.tags),
-                           skip_list=self.skip_list))
+                                          skip_list=self.skip_list))
         # update list of checked files
         self.checked_files.update([x['path'] for x in files])
 
