@@ -652,7 +652,7 @@ def normpath(path) -> str:
     Currently it generates a relative path but in the future we may want to
     make this user configurable.
     """
-    # convertion to string in order to allow receiving non string objects
+    # conversion to string in order to allow receiving non string objects
     return os.path.relpath(str(path))
 
 
