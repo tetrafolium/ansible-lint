@@ -8,10 +8,8 @@ import re
 class ComparisonToLiteralBoolRule(AnsibleLintRule):
     id = '601'
     shortdesc = "Don't compare to literal True/False"
-    description = (
-        'Use ``when: var`` rather than ``when: var == True`` '
-        '(or conversely ``when: not var``)'
-    )
+    description = ('Use ``when: var`` rather than ``when: var == True`` '
+                   '(or conversely ``when: not var``)')
     severity = 'HIGH'
     tags = ['idiom']
     version_added = 'v4.0.0'

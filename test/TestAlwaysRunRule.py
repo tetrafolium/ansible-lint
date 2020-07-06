@@ -9,7 +9,8 @@ import pytest
 @pytest.mark.skipif(
     ANSIBLE_MAJOR_VERSION > (2, 9),
     reason='Ansible 2.10 removed always_run attribute.',
-    raises=SystemExit, strict=True,
+    raises=SystemExit,
+    strict=True,
 )
 class TestAlwaysRun(unittest.TestCase):
     collection = RulesCollection()

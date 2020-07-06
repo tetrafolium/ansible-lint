@@ -38,10 +38,8 @@ except ImportError:
 class CommandsInsteadOfModulesRule(AnsibleLintRule):
     id = '303'
     shortdesc = 'Using command rather than module'
-    description = (
-        'Executing a command when there is an Ansible module '
-        'is generally a bad idea'
-    )
+    description = ('Executing a command when there is an Ansible module '
+                   'is generally a bad idea')
     severity = 'HIGH'
     tags = ['command-shell', 'resources', 'ANSIBLE0006']
     version_added = 'historic'

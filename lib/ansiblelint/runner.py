@@ -8,15 +8,19 @@ import ansiblelint.skip_utils
 from .errors import MatchError
 from .rules.LoadingFailureRule import LoadingFailureRule
 
-
 _logger = logging.getLogger(__name__)
 
 
 class Runner(object):
     """Runner class performs the linting process."""
-
-    def __init__(self, rules, playbook, tags, skip_list, exclude_paths,
-                 verbosity=0, checked_files=None) -> None:
+    def __init__(self,
+                 rules,
+                 playbook,
+                 tags,
+                 skip_list,
+                 exclude_paths,
+                 verbosity=0,
+                 checked_files=None) -> None:
         """Initialize a Runner instance."""
         self.rules = rules
         self.playbooks = set()
@@ -59,18 +63,21 @@ class Runner(object):
         for playbook in self.playbooks:
             if self.is_excluded(playbook[0]) or playbook[1] == 'role':
                 continue
-            files.append({'path': ansiblelint.utils.normpath(playbook[0]),
-                          'type': playbook[1],
-                          # add an absolute path here, so rules are able to validate if
-                          # referenced files exist
-                          'absolute_directory': os.path.dirname(playbook[0])})
+            files.append({
+                'path': ansiblelint.utils.normpath(playbook[0]),
+                'type': playbook[1],
+                # add an absolute path here, so rules are able to validate if
+                # referenced files exist
+                'absolute_directory': os.path.dirname(playbook[0])
+            })
         visited: Set = set()
         matches = list()
 
         while (visited != self.playbooks):
             for arg in self.playbooks - visited:
                 try:
-                    for child in ansiblelint.utils.find_children(arg, self.playbook_dir):
+                    for child in ansiblelint.utils.find_children(
+                            arg, self.playbook_dir):
                         if self.is_excluded(child['path']):
                             continue
                         self.playbooks.add((child['path'], child['type']))
@@ -81,17 +88,20 @@ class Runner(object):
                 visited.add(arg)
 
         # remove duplicates from files list
-        files = [value for n, value in enumerate(files) if value not in files[:n]]
+        files = [
+            value for n, value in enumerate(files) if value not in files[:n]
+        ]
 
         # remove files that have already been checked
         files = [x for x in files if x['path'] not in self.checked_files]
         for file in files:
-            _logger.debug(
-                "Examining %s of type %s",
-                ansiblelint.utils.normpath(file['path']),
-                file['type'])
-            matches.extend(self.rules.run(file, tags=set(self.tags),
-                                          skip_list=self.skip_list))
+            _logger.debug("Examining %s of type %s",
+                          ansiblelint.utils.normpath(file['path']),
+                          file['type'])
+            matches.extend(
+                self.rules.run(file,
+                               tags=set(self.tags),
+                               skip_list=self.skip_list))
         # update list of checked files
         self.checked_files.update([x['path'] for x in files])
 

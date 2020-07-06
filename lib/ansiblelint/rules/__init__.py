@@ -13,12 +13,10 @@ from ansiblelint.skip_utils import append_skipped_rules
 from ansiblelint.errors import Match
 import ansiblelint.utils
 
-
 _logger = logging.getLogger(__name__)
 
 
 class AnsibleLintRule(object):
-
     def __repr__(self) -> str:
         """Return a AnsibleLintRule instance representation."""
         return self.id + ": " + self.shortdesc
@@ -61,8 +59,8 @@ class AnsibleLintRule(object):
             message = None
             if isinstance(result, str):
                 message = result
-            matches.append(Match(prev_line_no + 1, line,
-                                 file['path'], self, message))
+            matches.append(
+                Match(prev_line_no + 1, line, file['path'], self, message))
         return matches
 
     def matchtasks(self, file: str, text: str) -> List[Match]:
@@ -93,8 +91,9 @@ class AnsibleLintRule(object):
             if isinstance(result, str):
                 message = result
             task_msg = "Task/Handler: " + ansiblelint.utils.task_to_str(task)
-            matches.append(Match(task[ansiblelint.utils.LINE_NUMBER_KEY], task_msg,
-                                 file['path'], self, message))
+            matches.append(
+                Match(task[ansiblelint.utils.LINE_NUMBER_KEY], task_msg,
+                      file['path'], self, message))
         return matches
 
     @staticmethod
@@ -117,7 +116,8 @@ class AnsibleLintRule(object):
         if isinstance(yaml, dict):
             yaml = [yaml]
 
-        yaml = ansiblelint.skip_utils.append_skipped_rules(yaml, text, file['type'])
+        yaml = ansiblelint.skip_utils.append_skipped_rules(
+            yaml, text, file['type'])
 
         for play in yaml:
             if self.id in play.get('skipped_rules', ()):
@@ -134,9 +134,10 @@ class AnsibleLintRule(object):
                 raise TypeError("{} is not a list".format(result))
 
             for section, message, *optional_linenumber in result:
-                linenumber = self._matchplay_linenumber(play, optional_linenumber)
-                matches.append(Match(linenumber,
-                                     section, file['path'], self, message))
+                linenumber = self._matchplay_linenumber(
+                    play, optional_linenumber)
+                matches.append(
+                    Match(linenumber, section, file['path'], self, message))
         return matches
 
 
@@ -158,7 +159,6 @@ def load_plugins(directory: str) -> List[AnsibleLintRule]:
 
 
 class RulesCollection(object):
-
     def __init__(self, rulesdirs=None) -> None:
         """Initialize a RulesCollection instance."""
         if rulesdirs is None:
@@ -192,14 +192,13 @@ class RulesCollection(object):
             with open(playbookfile['path'], mode='r', encoding='utf-8') as f:
                 text = f.read()
         except IOError as e:
-            _logger.warning(
-                "Couldn't open %s - %s",
-                playbookfile['path'],
-                e.strerror)
+            _logger.warning("Couldn't open %s - %s", playbookfile['path'],
+                            e.strerror)
             return matches
 
         for rule in self.rules:
-            if not tags or not set(rule.tags).union([rule.id]).isdisjoint(tags):
+            if not tags or not set(rule.tags).union([rule.id
+                                                     ]).isdisjoint(tags):
                 rule_definition = set(rule.tags)
                 rule_definition.add(rule.id)
                 if set(rule_definition).isdisjoint(skip_list):
@@ -211,8 +210,9 @@ class RulesCollection(object):
 
     def __repr__(self) -> str:
         """Return a RulesCollection instance representation."""
-        return "\n".join([rule.verbose()
-                          for rule in sorted(self.rules, key=lambda x: x.id)])
+        return "\n".join([
+            rule.verbose() for rule in sorted(self.rules, key=lambda x: x.id)
+        ])
 
     def listtags(self) -> str:
         tags = defaultdict(list)

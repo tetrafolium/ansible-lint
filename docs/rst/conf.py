@@ -32,7 +32,6 @@ sys.path.append(os.path.abspath('_themes'))
 VERSION = '2.6'
 AUTHOR = 'Ansible, Inc'
 
-
 # General configuration
 # ---------------------
 
@@ -44,7 +43,6 @@ extensions = ['sphinx.ext.autodoc', 'sphinx.ext.intersphinx']
 
 # Later on, add 'sphinx.ext.viewcode' to the list if you want to have
 # colorized code generated too for references.
-
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['.templates']
@@ -121,7 +119,6 @@ rst_epilog = """
 
 """
 
-
 # Options for HTML output
 # -----------------------
 
@@ -193,7 +190,6 @@ html_use_opensearch = 'https://docs.ansible.com/ansible/latest/'
 # Output file base name for HTML help builder.
 htmlhelp_basename = 'Poseidodoc'
 
-
 # Options for LaTeX output
 # ------------------------
 
@@ -229,10 +225,11 @@ latex_documents = [
 
 autoclass_content = 'both'
 
-intersphinx_mapping = {'python': ('https://docs.python.org/2/', (None, '../python2-2.7.13.inv')),
-                       'python3': ('https://docs.python.org/3/', (None, '../python3-3.6.2.inv')),
-                       'jinja2': ('http://jinja.pocoo.org/docs/', (None, '../jinja2-2.9.7.inv'))}
-
+intersphinx_mapping = {
+    'python': ('https://docs.python.org/2/', (None, '../python2-2.7.13.inv')),
+    'python3': ('https://docs.python.org/3/', (None, '../python3-3.6.2.inv')),
+    'jinja2': ('http://jinja.pocoo.org/docs/', (None, '../jinja2-2.9.7.inv'))
+}
 
 # table width fix via: https://rackerlabs.github.io/docs-rackspace/tools/rtd-tables.html
 html_static_path = ['_static']

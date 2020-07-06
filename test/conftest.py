@@ -8,9 +8,9 @@ from ansiblelint.rules import RulesCollection
 
 @pytest.fixture
 def default_rules_collection():
-    return RulesCollection(rulesdirs=[os.path.abspath(os.path.join('lib',
-                                                                   'ansiblelint',
-                                                                   'rules'))])
+    return RulesCollection(rulesdirs=[
+        os.path.abspath(os.path.join('lib', 'ansiblelint', 'rules'))
+    ])
 
 
 @pytest.fixture

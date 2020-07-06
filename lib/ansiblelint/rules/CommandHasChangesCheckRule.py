@@ -28,8 +28,7 @@ class CommandHasChangesCheckRule(AnsibleLintRule):
         'Commands should either read information (and thus set '
         '``changed_when``) or not do something if it has already been '
         'done (using creates/removes) or only do it if another '
-        'check has a particular result (``when``)'
-    )
+        'check has a particular result (``when``)')
     severity = 'HIGH'
     tags = ['command-shell', 'idempotency', 'ANSIBLE0012']
     version_added = 'historic'

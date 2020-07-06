@@ -4,23 +4,24 @@ import pytest
 
 from ansiblelint.runner import Runner
 
-
 PlayFile = namedtuple('PlayFile', ['name', 'content'])
 
-
-PLAY_INCLUDING_PLAIN = PlayFile('playbook.yml', u'''
+PLAY_INCLUDING_PLAIN = PlayFile(
+    'playbook.yml', u'''
 - hosts: all
   tasks:
     - include: some_file.yml
 ''')
 
-PLAY_INCLUDING_JINJA2 = PlayFile('playbook.yml', u'''
+PLAY_INCLUDING_JINJA2 = PlayFile(
+    'playbook.yml', u'''
 - hosts: all
   tasks:
     - include: "{{ some_path }}/some_file.yml"
 ''')
 
-PLAY_INCLUDING_NOQA = PlayFile('playbook.yml', u'''
+PLAY_INCLUDING_NOQA = PlayFile(
+    'playbook.yml', u'''
 - hosts: all
   tasks:
     - include: some_file.yml # noqa 505
@@ -53,9 +54,9 @@ def _play_files(tmp_path, request):
 
 
 @pytest.mark.parametrize(
-    '_play_files', (pytest.param([PLAY_INCLUDING_PLAIN], id='referenced file missing'), ),
-    indirect=['_play_files']
-)
+    '_play_files',
+    (pytest.param([PLAY_INCLUDING_PLAIN], id='referenced file missing'), ),
+    indirect=['_play_files'])
 @pytest.mark.usefixtures('_play_files')
 def test_include_file_missing(runner):
     results = str(runner.run())
@@ -66,13 +67,10 @@ def test_include_file_missing(runner):
 
 @pytest.mark.parametrize(
     '_play_files',
-    (
-        pytest.param([PLAY_INCLUDING_PLAIN, PLAY_INCLUDED], id='File Exists'),
-        pytest.param([PLAY_INCLUDING_JINJA2], id='JINJA2 in reference'),
-        pytest.param([PLAY_INCLUDING_NOQA], id='NOQA was used')
-    ),
-    indirect=['_play_files']
-)
+    (pytest.param([PLAY_INCLUDING_PLAIN, PLAY_INCLUDED], id='File Exists'),
+     pytest.param([PLAY_INCLUDING_JINJA2], id='JINJA2 in reference'),
+     pytest.param([PLAY_INCLUDING_NOQA], id='NOQA was used')),
+    indirect=['_play_files'])
 @pytest.mark.usefixtures('_play_files')
 def test_cases_that_do_not_report(runner):
     results = str(runner.run())

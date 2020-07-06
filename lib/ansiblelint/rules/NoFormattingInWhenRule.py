@@ -21,8 +21,9 @@ class NoFormattingInWhenRule(AnsibleLintRule):
                 return errors
             for role in play['roles']:
                 if self.matchtask(file, role):
-                    errors.append(({'when': role},
-                                   'role "when" clause has Jinja2 templates'))
+                    errors.append(({
+                        'when': role
+                    }, 'role "when" clause has Jinja2 templates'))
         if isinstance(play, list):
             for play_item in play:
                 sub_errors = self.matchplay(file, play_item)

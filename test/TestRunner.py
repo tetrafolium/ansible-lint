@@ -25,8 +25,8 @@ import ansiblelint.formatters as formatters
 from ansiblelint.runner import Runner
 from ansiblelint.cli import abspath
 
-
-LOTS_OF_WARNINGS_PLAYBOOK = abspath('examples/lots_of_warnings.yml', os.getcwd())
+LOTS_OF_WARNINGS_PLAYBOOK = abspath('examples/lots_of_warnings.yml',
+                                    os.getcwd())
 
 
 @pytest.mark.parametrize(('playbook', 'exclude', 'length'), (
@@ -48,17 +48,15 @@ def test_runner(default_rules_collection, playbook, exclude, length):
 
 @pytest.mark.parametrize(('formatter_cls', 'format_kwargs'), (
     pytest.param(formatters.Formatter, {}, id='Formatter-plain'),
-    pytest.param(formatters.ParseableFormatter,
-                 {'colored': True},
+    pytest.param(formatters.ParseableFormatter, {'colored': True},
                  id='ParseableFormatter-colored'),
-    pytest.param(formatters.QuietFormatter,
-                 {'colored': True},
+    pytest.param(formatters.QuietFormatter, {'colored': True},
                  id='QuietFormatter-colored'),
-    pytest.param(formatters.Formatter,
-                 {'colored': True},
+    pytest.param(formatters.Formatter, {'colored': True},
                  id='Formatter-colored'),
 ))
-def test_runner_unicode_format(default_rules_collection, formatter_cls, format_kwargs):
+def test_runner_unicode_format(default_rules_collection, formatter_cls,
+                               format_kwargs):
     formatter = formatter_cls(os.getcwd(), True)
     runner = Runner(default_rules_collection, 'test/unicode.yml', [], [], [])
 
@@ -77,11 +75,13 @@ def test_files_not_scanned_twice(default_rules_collection):
     checked_files = set()
 
     filename = os.path.abspath('test/common-include-1.yml')
-    runner = Runner(default_rules_collection, filename, [], [], [], 0, checked_files)
+    runner = Runner(default_rules_collection, filename, [], [], [], 0,
+                    checked_files)
     run1 = runner.run()
 
     filename = os.path.abspath('test/common-include-2.yml')
-    runner = Runner(default_rules_collection, filename, [], [], [], 0, checked_files)
+    runner = Runner(default_rules_collection, filename, [], [], [], 0,
+                    checked_files)
     run2 = runner.run()
 
     assert ((len(run1) + len(run2)) == 1)

@@ -2,7 +2,6 @@
 import logging
 from ansiblelint.rules import RulesCollection
 
-
 DOC_HEADER = """
 .. _lint_default_rules:
 
@@ -32,9 +31,7 @@ def rules_as_rst(rules: RulesCollection) -> str:
 
         if d.id.endswith('01'):
 
-            section = '{} Rules ({}xx)'.format(
-                d.tags[0].title(),
-                d.id[-3:-2])
+            section = '{} Rules ({}xx)'.format(d.tags[0].title(), d.id[-3:-2])
             r += f'\n\n{section}\n{ "-" * len(section) }'
 
         title = f"{d.id}: {d.shortdesc}"

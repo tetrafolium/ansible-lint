@@ -17,7 +17,6 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
-
 """Utils related to inline skipping of rules."""
 from itertools import product
 import logging
@@ -30,11 +29,9 @@ if sys.version_info >= (3, 8):
 else:
     from typing_extensions import Literal
 
-
 INLINE_SKIP_FLAG = '# noqa '
 
 _logger = logging.getLogger(__name__)
-
 
 FileType = Literal["playbook", "pre_tasks", "post_tasks"]
 
@@ -50,7 +47,8 @@ def get_rule_skips_from_line(line: str) -> List:
     return noqa_text.split()
 
 
-def append_skipped_rules(pyyaml_data: str, file_text: str, file_type: FileType):
+def append_skipped_rules(pyyaml_data: str, file_text: str,
+                         file_type: FileType):
     """Append 'skipped_rules' to individual tasks or single metadata block.
 
     For a file, uses 2nd parser (ruamel.yaml) to pull comments out of
@@ -72,13 +70,15 @@ def append_skipped_rules(pyyaml_data: str, file_text: str, file_type: FileType):
     return yaml_skip
 
 
-def _append_skipped_rules(pyyaml_data: Sequence, file_text: str, file_type: FileType):
+def _append_skipped_rules(pyyaml_data: Sequence, file_text: str,
+                          file_type: FileType):
     # parse file text using 2nd parser library
     yaml = ruamel.yaml.YAML()
     ruamel_data = yaml.load(file_text)
 
     if file_type == 'meta':
-        pyyaml_data[0]['skipped_rules'] = _get_rule_skips_from_yaml(ruamel_data)
+        pyyaml_data[0]['skipped_rules'] = _get_rule_skips_from_yaml(
+            ruamel_data)
         return pyyaml_data
 
     # create list of blocks of tasks or nested tasks
@@ -138,11 +138,8 @@ def _get_tasks_from_blocks(task_blocks: Sequence) -> Generator:
     ]
 
     def get_nested_tasks(task: Any):
-        return (
-            subtask
-            for k in NESTED_TASK_KEYS if k in task
-            for subtask in task[k]
-        )
+        return (subtask for k in NESTED_TASK_KEYS if k in task
+                for subtask in task[k])
 
     for task in task_blocks:
         for sub_task in get_nested_tasks(task):

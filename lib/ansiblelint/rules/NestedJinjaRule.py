@@ -28,11 +28,9 @@ from ansiblelint.rules import AnsibleLintRule
 class NestedJinjaRule(AnsibleLintRule):
     id = '207'
     shortdesc = 'Nested jinja pattern'
-    description = (
-        "There should not be any nested jinja pattern. "
-        "Example (bad): ``{{ list_one + {{ list_two | max }} }}``, "
-        "example (good): ``{{ list_one + max(list_two) }}``"
-    )
+    description = ("There should not be any nested jinja pattern. "
+                   "Example (bad): ``{{ list_one + {{ list_two | max }} }}``, "
+                   "example (good): ``{{ list_one + max(list_two) }}``")
     severity = 'VERY_HIGH'
     tags = ['formatting']
     version_added = 'v4.3.0'
@@ -46,7 +44,6 @@ class NestedJinjaRule(AnsibleLintRule):
             # task properties are stored in the 'action' key
             for key, value in task['action'].items()
             # exclude useless values of '__file__', '__ansible_module__', '__*__', etc.
-            if not key.startswith('__') and not key.endswith('__')
-        )
+            if not key.startswith('__') and not key.endswith('__'))
 
         return bool(self.pattern.search(command))

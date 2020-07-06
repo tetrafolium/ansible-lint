@@ -12,9 +12,11 @@ from typing import List, NamedTuple
 from ansiblelint.constants import DEFAULT_RULESDIR, INVALID_CONFIG_RC
 from ansiblelint.version import __version__
 
-
 _logger = logging.getLogger(__name__)
-_PATH_VARS = ['exclude_paths', 'rulesdir', ]
+_PATH_VARS = [
+    'exclude_paths',
+    'rulesdir',
+]
 
 
 def abspath(path: str, base_dir: str) -> str:
@@ -94,68 +96,105 @@ class AbspathArgAction(argparse.Action):
 def get_cli_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('-L', dest='listrules', default=False,
-                        action='store_true', help="list all the rules")
-    parser.add_argument('-f', dest='format', default='plain',
-                        choices=['plain', 'rst'],
-                        help="Format used rules output, (default: %(default)s)")
-    parser.add_argument('-q', dest='quiet',
+    parser.add_argument('-L',
+                        dest='listrules',
+                        default=False,
+                        action='store_true',
+                        help="list all the rules")
+    parser.add_argument(
+        '-f',
+        dest='format',
+        default='plain',
+        choices=['plain', 'rst'],
+        help="Format used rules output, (default: %(default)s)")
+    parser.add_argument('-q',
+                        dest='quiet',
                         default=False,
                         action='store_true',
                         help="quieter, although not silent output")
-    parser.add_argument('-p', dest='parseable',
+    parser.add_argument('-p',
+                        dest='parseable',
                         default=False,
                         action='store_true',
                         help="parseable output in the format of pep8")
-    parser.add_argument('--parseable-severity', dest='parseable_severity',
+    parser.add_argument('--parseable-severity',
+                        dest='parseable_severity',
                         default=False,
                         action='store_true',
                         help="parseable output including severity of rule")
-    parser.add_argument('-r', action=AbspathArgAction, dest='rulesdir',
-                        default=[], type=Path,
-                        help="Specify custom rule directories. Add -R "
-                             f"to keep using embedded rules from {DEFAULT_RULESDIR}")
-    parser.add_argument('-R', action='store_true',
+    parser.add_argument(
+        '-r',
+        action=AbspathArgAction,
+        dest='rulesdir',
+        default=[],
+        type=Path,
+        help="Specify custom rule directories. Add -R "
+        f"to keep using embedded rules from {DEFAULT_RULESDIR}")
+    parser.add_argument('-R',
+                        action='store_true',
                         default=False,
                         dest='use_default_rules',
                         help="Keep default rules when using -r")
-    parser.add_argument('--show-relpath', dest='display_relative_path', action='store_false',
+    parser.add_argument('--show-relpath',
+                        dest='display_relative_path',
+                        action='store_false',
                         default=True,
                         help="Display path relative to CWD")
-    parser.add_argument('-t', dest='tags',
-                        action='append',
-                        default=[],
-                        help="only check rules whose id/tags match these values")
-    parser.add_argument('-T', dest='listtags', action='store_true',
+    parser.add_argument(
+        '-t',
+        dest='tags',
+        action='append',
+        default=[],
+        help="only check rules whose id/tags match these values")
+    parser.add_argument('-T',
+                        dest='listtags',
+                        action='store_true',
                         help="list all the tags")
-    parser.add_argument('-v', dest='verbosity', action='count',
+    parser.add_argument('-v',
+                        dest='verbosity',
+                        action='count',
                         help="Increase verbosity level",
                         default=0)
-    parser.add_argument('-x', dest='skip_list', default=[], action='append',
+    parser.add_argument('-x',
+                        dest='skip_list',
+                        default=[],
+                        action='append',
                         help="only check rules whose id/tags do not "
                         "match these values")
-    parser.add_argument('--nocolor', dest='colored',
-                        default=hasattr(sys.stdout, 'isatty') and sys.stdout.isatty(),
+    parser.add_argument('--nocolor',
+                        dest='colored',
+                        default=hasattr(sys.stdout, 'isatty')
+                        and sys.stdout.isatty(),
                         action='store_false',
                         help="disable colored output")
-    parser.add_argument('--force-color', dest='colored',
-                        action='store_true',
-                        help="Try force colored output (relying on ansible's code)")
-    parser.add_argument('--exclude', dest='exclude_paths',
-                        action=AbspathArgAction,
-                        type=Path, default=[],
-                        help='path to directories or files to skip. '
-                             'This option is repeatable.',
-                        )
-    parser.add_argument('-c', dest='config_file',
+    parser.add_argument(
+        '--force-color',
+        dest='colored',
+        action='store_true',
+        help="Try force colored output (relying on ansible's code)")
+    parser.add_argument(
+        '--exclude',
+        dest='exclude_paths',
+        action=AbspathArgAction,
+        type=Path,
+        default=[],
+        help='path to directories or files to skip. '
+        'This option is repeatable.',
+    )
+    parser.add_argument('-c',
+                        dest='config_file',
                         help='Specify configuration file to use.  '
-                             'Defaults to ".ansible-lint"')
-    parser.add_argument('--version', action='version',
-                        version='%(prog)s {ver!s}'.format(ver=__version__),
-                        )
-    parser.add_argument(dest='playbook', nargs='*',
-                        help="One or more files or paths. When missing it will "
-                        " enable auto-detection mode.")
+                        'Defaults to ".ansible-lint"')
+    parser.add_argument(
+        '--version',
+        action='version',
+        version='%(prog)s {ver!s}'.format(ver=__version__),
+    )
+    parser.add_argument(
+        dest='playbook',
+        nargs='*',
+        help="One or more files or paths. When missing it will "
+        " enable auto-detection mode.")
 
     return parser
 
@@ -168,20 +207,21 @@ def merge_config(file_config, cli_config) -> NamedTuple:
         cli_config.quiet = cli_config.quiet or file_config['quiet']
 
     if 'parseable' in file_config:
-        cli_config.parseable = (cli_config.parseable or
-                                file_config['parseable'])
+        cli_config.parseable = (cli_config.parseable
+                                or file_config['parseable'])
 
     if 'parseable_severity' in file_config:
-        cli_config.parseable_severity = (cli_config.parseable_severity or
-                                         file_config['parseable_severity'])
+        cli_config.parseable_severity = (cli_config.parseable_severity
+                                         or file_config['parseable_severity'])
 
     if 'display_relative_path' in file_config:
-        cli_config.display_relative_path = (cli_config.display_relative_path or
-                                            file_config['display_relative_path'])
+        cli_config.display_relative_path = (
+            cli_config.display_relative_path
+            or file_config['display_relative_path'])
 
     if 'use_default_rules' in file_config:
-        cli_config.use_default_rules = (cli_config.use_default_rules or
-                                        file_config['use_default_rules'])
+        cli_config.use_default_rules = (cli_config.use_default_rules
+                                        or file_config['use_default_rules'])
 
     if 'verbosity' in file_config:
         cli_config.verbosity = (cli_config.verbosity +

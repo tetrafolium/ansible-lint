@@ -61,14 +61,17 @@ def test_tags(test_rules_collection, ematchtestfile, bracketsmatchtestfile):
     assert len(matches) == 2
 
 
-def test_skip_tags(test_rules_collection, ematchtestfile, bracketsmatchtestfile):
+def test_skip_tags(test_rules_collection, ematchtestfile,
+                   bracketsmatchtestfile):
     matches = test_rules_collection.run(ematchtestfile, skip_list=['test1'])
     assert len(matches) == 0
     matches = test_rules_collection.run(ematchtestfile, skip_list=['test2'])
     assert len(matches) == 3
-    matches = test_rules_collection.run(bracketsmatchtestfile, skip_list=['test1'])
+    matches = test_rules_collection.run(bracketsmatchtestfile,
+                                        skip_list=['test1'])
     assert len(matches) == 2
-    matches = test_rules_collection.run(bracketsmatchtestfile, skip_list=['test2'])
+    matches = test_rules_collection.run(bracketsmatchtestfile,
+                                        skip_list=['test2'])
     assert len(matches) == 1
 
 
@@ -77,14 +80,17 @@ def test_skip_id(test_rules_collection, ematchtestfile, bracketsmatchtestfile):
     assert len(matches) == 0
     matches = test_rules_collection.run(ematchtestfile, skip_list=['TEST0002'])
     assert len(matches) == 3
-    matches = test_rules_collection.run(bracketsmatchtestfile, skip_list=['TEST0001'])
+    matches = test_rules_collection.run(bracketsmatchtestfile,
+                                        skip_list=['TEST0001'])
     assert len(matches) == 2
-    matches = test_rules_collection.run(bracketsmatchtestfile, skip_list=['TEST0002'])
+    matches = test_rules_collection.run(bracketsmatchtestfile,
+                                        skip_list=['TEST0002'])
     assert len(matches) == 1
 
 
 def test_skip_non_existent_id(test_rules_collection, ematchtestfile):
-    matches = test_rules_collection.run(ematchtestfile, skip_list=['DOESNOTEXIST'])
+    matches = test_rules_collection.run(ematchtestfile,
+                                        skip_list=['DOESNOTEXIST'])
     assert len(matches) == 3
 
 

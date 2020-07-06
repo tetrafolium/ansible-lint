@@ -15,9 +15,7 @@ class MetaChangeFromDefaultRule(AnsibleLintRule):
     ]
     description = (
         'meta/main.yml default values should be changed for: ``{}``'.format(
-            ', '.join(f[0] for f in field_defaults)
-        )
-    )
+            ', '.join(f[0] for f in field_defaults)))
     severity = 'HIGH'
     tags = ['metadata']
     version_added = 'v4.0.0'
@@ -34,7 +32,8 @@ class MetaChangeFromDefaultRule(AnsibleLintRule):
         for field, default in self.field_defaults:
             value = galaxy_info.get(field, None)
             if value and value == default:
-                results.append(({'meta/main.yml': data},
-                                'Should change default metadata: %s' % field))
+                results.append(({
+                    'meta/main.yml': data
+                }, 'Should change default metadata: %s' % field))
 
         return results

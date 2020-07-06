@@ -11,11 +11,9 @@ from ansiblelint.rules import AnsibleLintRule
 class IncludeMissingFileRule(AnsibleLintRule):
     id = '505'
     shortdesc = 'referenced files must exist'
-    description = (
-        'All files referenced by by include / import tasks '
-        'must exist. The check excludes files with jinja2 '
-        'templates in the filename.'
-    )
+    description = ('All files referenced by by include / import tasks '
+                   'must exist. The check excludes files with jinja2 '
+                   'templates in the filename.')
     severity = 'MEDIUM'
     tags = ['task', 'bug']
     version_added = 'v4.3.0'
@@ -32,11 +30,11 @@ class IncludeMissingFileRule(AnsibleLintRule):
             # collect information which file was referenced for include / import
             referenced_file = None
             for key, val in task.items():
-                if not (key.startswith('include_') or
-                        key.startswith('import_') or
-                        key == 'include'):
+                if not (key.startswith('include_') or key.startswith('import_')
+                        or key == 'include'):
                     continue
-                if isinstance(val, ansible.parsing.yaml.objects.AnsibleMapping):
+                if isinstance(val,
+                              ansible.parsing.yaml.objects.AnsibleMapping):
                     referenced_file = val.get('file', None)
                 else:
                     referenced_file = val
@@ -58,7 +56,8 @@ class IncludeMissingFileRule(AnsibleLintRule):
             if os.path.isfile(referenced_file):
                 continue
 
-            results.append(({'referenced_file': referenced_file},
-                            'referenced missing file in %s:%i'
-                            % (task['__file__'], task['__line__'])))
+            results.append(({
+                'referenced_file': referenced_file
+            }, 'referenced missing file in %s:%i' %
+                            (task['__file__'], task['__line__'])))
         return results
